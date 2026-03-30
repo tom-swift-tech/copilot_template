@@ -1,0 +1,86 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Pre-Review Checks",
+      "type": "shell",
+      "command": "echo '🔍 Running pre-review checks...' && echo '' && echo '📦 Build...' && echo '   (uncomment build command for your stack)' && echo '' && echo '🧹 Lint...' && echo '   (uncomment lint command for your stack)' && echo '' && echo '🧪 Tests...' && echo '   (uncomment test command for your stack)' && echo '' && echo '✅ Pre-review checks complete.'",
+      "detail": "Run build, lint, and test checks before requesting a review. Customize the commands for your stack.",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Architect: New Design Doc",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "$name = '${input:featureName}'; $dir = 'docs/design'; if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force }; $content = \"# $name Design`n`n## Problem Statement`nWhat are we solving and why?`n`n## Constraints`nHard requirements, performance targets, compatibility needs.`n`n## Approach`nHow will we solve it?`n`n## Data Model`nTypes, schemas, interfaces.`n`n## API Surface`nEndpoints, function signatures, events.`n`n## Infrastructure`nAzure resources, Terraform modules, networking.`n`n## Security`nRBAC, secrets management, network boundaries.`n`n## Trade-offs`nWhat did we consider and reject? Why?`n`n## Open Questions`nWhat still needs input?\"; Set-Content -Path \"$dir/$name.md\" -Value $content -Encoding UTF8; Write-Host \"Created $dir/$name.md\""
+      ],
+      "detail": "Create a new design document from the Architect template.",
+      "problemMatcher": []
+    },
+    {
+      "label": "Architect: New ADR",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "$num = '${input:adrNumber}'; $slug = '${input:adrSlug}'; $title = '${input:adrTitle}'; $dir = 'docs/adr'; if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force }; $content = \"# ADR-$num`: $title`n`n## Status: Proposed`n`n## Context`nWhat forces are at play?`n`n## Decision`nWhat are we doing?`n`n## Consequences`nWhat becomes easier? What becomes harder?\"; Set-Content -Path \"$dir/$num-$slug.md\" -Value $content -Encoding UTF8; Write-Host \"Created $dir/$num-$slug.md\""
+      ],
+      "detail": "Create a new Architecture Decision Record.",
+      "problemMatcher": []
+    },
+    {
+      "label": "Terraform: Validate",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "Write-Host '🔍 Terraform format check...' ; terraform fmt -check -recursive ; Write-Host '✅ Validating...' ; terraform validate ; Write-Host '📋 Planning...' ; terraform plan -no-color"
+      ],
+      "detail": "Run terraform fmt check, validate, and plan.",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Ansible: Lint",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "Write-Host '🧹 Running ansible-lint...' ; ansible-lint --force-color"
+      ],
+      "detail": "Run ansible-lint on playbooks and roles.",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "featureName",
+      "description": "Feature name (kebab-case, e.g., user-authentication)",
+      "type": "promptString"
+    },
+    {
+      "id": "adrNumber",
+      "description": "ADR number (e.g., 0001)",
+      "type": "promptString"
+    },
+    {
+      "id": "adrSlug",
+      "description": "ADR slug (kebab-case, e.g., use-sqlite-over-postgres)",
+      "type": "promptString"
+    },
+    {
+      "id": "adrTitle",
+      "description": "ADR title (human readable)",
+      "type": "promptString"
+    }
+  ]
+}

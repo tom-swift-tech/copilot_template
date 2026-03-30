@@ -1,0 +1,26 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Dependencies (uncomment per stack)
+# node_modules/
+# __pycache__/
+# .terraform/
+# target/
+
+# Build output (uncomment per stack)
+# dist/
+# build/
+# *.pyc
