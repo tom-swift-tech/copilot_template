@@ -1,158 +1,87 @@
-# Copilot Chat Quick Reference
+# GitHub Copilot Cheatsheet — Folder Agent V2
 
-> How to get the most out of GitHub Copilot Chat in this project.
-> The `.github/copilot-instructions.md` file is automatically loaded,
-> so Copilot already knows the project conventions and quality standards.
+> Quick reference for the agent-based workflow. Pin this or keep it open.
 
 ---
 
-## Mode Prefixes
+## Agent Selection
 
-Start your chat message with a mode to set the context:
+Select agents from the **Copilot agent dropdown** in VS Code (or use `@agent-name` in chat):
 
-### Architect Mode
-```
-[Architect] Design an authentication system that supports both JWT
-and API key auth. Output a design doc.
-```
-```
-[Architect] We need a Terraform module for provisioning AKS clusters
-with standard FNF tagging. Sketch the interface.
-```
+| Agent        | When to Use                                    |
+|-------------|------------------------------------------------|
+| `Architect`  | Planning, design docs, ADRs — **can't edit code** |
+| `Scaffolder` | New project setup, config, boilerplate — **no business logic** |
+| `Builder`    | Day-to-day coding — **default, full access**   |
+| `Reviewer`   | Code review, quality checks — **can't edit code** |
 
-### Scaffold Mode
-```
-[Scaffold] Based on docs/design/auth.md, set up the directory structure
-and placeholder types. No implementation.
-```
-```
-[Scaffold] Create an Ansible role skeleton for configure-monitoring
-with defaults for Prometheus and Grafana endpoints.
-```
+## Slash Commands
 
-### Build Mode (default — prefix optional)
-```
-Implement the token validation middleware per docs/design/auth.md.
-Include error handling and tests.
-```
-```
-Write the Terraform module for the Azure App Service per
-docs/design/app-service-module.md.
-```
+Type these in Copilot Chat:
 
-### Review Mode
-```
-[Review] Review the changes in src/auth/ against our quality standards.
-Check for edge cases and error handling gaps.
-```
-```
-[Review] Check this Terraform module for hardcoded values, missing
-tags, and destroy-safety.
-```
+| Command          | What It Does                              |
+|------------------|-------------------------------------------|
+| `/debug`         | Guided debugging session                  |
+| `/feature`       | Full feature workflow (design → implement → test) |
+| `/refactor`      | Safe refactoring with before/after tests  |
+| `/review`        | Code review against project conventions    |
+| `/test`          | Generate tests for selected code           |
+| `/deploy`        | Deployment checklist and steps             |
+| `/status`        | Current tasks and project state            |
+| `/update-memory` | Save session learnings to memory files     |
 
----
+## How It Works
 
-## Useful Chat Patterns
+1. **Always-on context**: `AGENTS.md` and `.github/copilot-instructions.md` load automatically.
+2. **Scoped rules**: Language-specific instructions load only when editing matching files (Rust for `.rs`, Terraform for `.tf`, etc.).
+3. **Agent handoffs**: Agents pass work to each other — Architect designs, Scaffolder structures, Builder implements, Reviewer gates.
+4. **Persistent memory**: `.agent/memory/` stores gotchas, lessons, and patterns across sessions.
 
-### Reference project files for context
-```
-@workspace #file:docs/design/auth.md Implement the token refresh
-endpoint described in this design doc.
-```
+## Workflow Examples
 
-### Ask for review of selected code
-Select code, then:
-```
-[Review] Check this against our conventions. Flag any anti-patterns.
-```
+### New Feature
 
-### Generate tests for existing code
-Select a function, then:
-```
-Write tests for this function. Cover happy path, empty input,
-error cases, and boundary conditions. Use Arrange-Act-Assert.
-```
+1. Switch to **Architect** → describe what you need
+2. Architect produces design doc → hands off to **Scaffolder**
+3. Scaffolder creates structure → hands off to **Builder**
+4. Builder implements → hands off to **Reviewer**
+5. Reviewer approves or sends back to Builder
 
-### Get design feedback
-```
-[Architect] I'm considering two approaches for the caching layer:
-1. In-memory LRU with TTL
-2. Azure Redis Cache
-What are the trade-offs given our infrastructure constraints?
-```
+### Bug Fix
 
-### Bug fix workflow
+1. Use **Builder** (default) with `/debug`
+2. After fix, `/test` to add regression test
+3. `/review` for self-review before PR
+4. `/update-memory` to capture the gotcha
+
+### Quick Code Review
+
+1. Switch to **Reviewer**
+2. `/review` — gets conventions-aware feedback
+3. Fix issues in **Builder** mode
+
+## File Quick Reference
+
 ```
-I'm seeing [error description] when [scenario]. Help me:
-1. Write a failing test that reproduces this
-2. Identify the root cause
-3. Implement the minimal fix
+.github/
+  copilot-instructions.md  ← Always-on (slim, points to .agent/)
+  agents/                  ← Agent personas (dropdown selection)
+  instructions/            ← Language rules (auto-load by file type)
+  prompts/                 ← Slash commands
+  skills/                  ← Multi-step capabilities
+
+.agent/
+  context/                 ← Project knowledge base
+  tasks/                   ← Work tracking
+  memory/                  ← Persistent learnings
+
+AGENTS.md                  ← Agent definitions (always loaded)
+CLAUDE.md                  ← Claude Code entry point
 ```
 
-### Refactor safely
-Select code, then:
-```
-Refactor this to [goal]. Preserve existing behavior exactly.
-Show me the changes step by step so I can verify tests pass between each.
-```
+## Tips
 
-### Infrastructure patterns
-```
-[Architect] Design a Terraform module structure for deploying
-an Azure Function App with Key Vault integration and managed identity.
-```
-```
-[Build] Write an Ansible playbook to configure nginx reverse proxy
-with SSL termination. Must be idempotent.
-```
-```
-[Review] Check this ServiceNow business rule for hardcoded sys_ids,
-performance issues, and scope safety.
-```
-
----
-
-## Key `#file` References
-
-Point Copilot to these files when you need it to follow specific standards:
-
-| When you need... | Reference |
-|---|---|
-| Code conventions | `#file:.github/copilot-instructions.md` (auto-loaded) |
-| Feature design | `#file:docs/design/<feature>.md` |
-| Quality checklist | Chat: "Check against our Definition of Done" |
-| ADR context | `#file:docs/adr/<number>-<slug>.md` |
-
----
-
-## VS Code Tasks
-
-Run these from the Command Palette (`Ctrl+Shift+P` → `Tasks: Run Task`):
-
-| Task | Purpose |
-|---|---|
-| **Pre-Review Checks** | Build + lint + test before review |
-| **Architect: New Design Doc** | Create a design doc from template |
-| **Architect: New ADR** | Create an ADR from template |
-| **Terraform: Validate** | Format check + validate + plan |
-| **Ansible: Lint** | Run ansible-lint on playbooks |
-
----
-
-## Limitations vs. Claude Code
-
-Be aware of these differences when switching between home and work:
-
-| Feature | Claude Code (home) | Copilot (work) |
-|---------|-------------------|----------------|
-| Instructions | 4 separate role prompts | 1 combined file |
-| Mode switching | Session declaration | Chat prefix |
-| Hooks | Shell scripts via stop hooks | VS Code tasks |
-| Context | Full workspace awareness | `#file:` references |
-| Persistence | Session-aware | Stateless per chat |
-| Tool use | MCP, bash, file ops | Chat + inline only |
-| VALOR integration | Native via hooks | N/A |
-
-**Workflow tip**: Design at home with Claude Code (full Architect mode),
-then implement at work with Copilot (Build mode) referencing the design
-docs you committed.
+- **Memory compounds**: Use `/update-memory` after every significant session. Future agents benefit.
+- **Gotchas first**: Agents check `.agent/memory/gotchas.md` before implementing. Keep it current.
+- **ADRs matter**: When Architect makes a design decision, it goes into `.agent/context/decisions.md`. Future agents won't re-debate it.
+- **Scoped instructions are free**: They only load when relevant. Add more without bloating context.
