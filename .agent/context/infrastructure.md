@@ -48,9 +48,9 @@ All Azure resources follow: `{prefix}-{env}-{region}-{service}-{instance}`
 | Event Hub               | `evh`       |
 
 **Examples:**
-- `fnf-prd-eus2-aks-01` — Production AKS cluster in East US 2
-- `fnfprdeus2st01` — Production storage account (no hyphens)
-- `fnf-dev-cus-vm-01` — Dev VM in Central US
+- `contoso-prd-eus2-aks-01` — Production AKS cluster in East US 2
+- `contosoprdeus2st01` — Production storage account (no hyphens)
+- `contoso-dev-cus-vm-01` — Dev VM in Central US
 
 ### Tagging Policy
 
