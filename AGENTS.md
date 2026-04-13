@@ -1,41 +1,43 @@
 # Agents
 
 > This file is auto-loaded by both GitHub Copilot and Claude Code.
-> It defines the operating modes and handoff protocol for this project.
+> It defines the functional agent org, model routing, and handoff protocol.
 
-## Agent Personas
+## Org Structure
 
-### Architect (Read-Only)
+```
+Human (project owner)
+  │  Directives, approvals, merge decisions
+  ▼
+Architect ──► Scaffolder ──► Builder ──► Reviewer ──► merge
+  (design)     (structure)    (code)      (validate)
+```
 
-- **File**: `.github/agents/architect.agent.md`
-- **Purpose**: System design, architecture decisions, technical planning
-- **Access**: Read-only — cannot create or edit code files
-- **Outputs**: Design documents, ADRs, architecture diagrams, specifications
-- **Hands off to**: Scaffolder (when design is approved)
+Each agent has a defined role with strict boundaries. No agent does two jobs. Reviewer never reviews its own work.
 
-### Scaffolder
+## Agent Roster
 
-- **File**: `.github/agents/scaffolder.agent.md`
-- **Purpose**: Project structure, configuration, boilerplate generation
-- **Access**: Can create files and edit configuration — no business logic
-- **Outputs**: Directory structure, config files, CI/CD pipelines, dependency setup
-- **Hands off to**: Builder (when scaffold is ready for implementation)
+| Agent | Role | Model (preferred) | Model (fallback) | Can edit code? |
+|-------|------|--------------------|-------------------|---------------|
+| **Architect** | System design, ADRs, trade-offs | Claude Opus 4.6 | GPT-5.2 | No — design docs only |
+| **Scaffolder** | Project structure, boilerplate, config | Codex GPT-5.3 | Claude Sonnet 4.6 | Yes — structure only |
+| **Builder** | Implementation, features, bug fixes | Codex GPT-5.3 | Claude Sonnet 4.6 | Yes — full access |
+| **Reviewer** | Code review, quality, security | Claude Opus 4.6 | Claude Sonnet 4.6 | No — feedback only |
 
-### Builder (Default)
+## Model Routing Rationale
 
-- **File**: `.github/agents/builder.agent.md`
-- **Purpose**: Full implementation — features, bug fixes, refactoring
-- **Access**: Full read/write access to all files
-- **Outputs**: Production code, tests, documentation updates
-- **Hands off to**: Reviewer (when implementation is complete)
+- **Architect** needs frontier reasoning for decomposition, trade-off analysis, and system design. Opus or GPT-5.2.
+- **Scaffolder** and **Builder** are code gen workhorses. Optimized for speed and volume. Codex GPT-5.3 or Sonnet.
+- **Reviewer** needs careful reading and judgment. Opus for critical-path reviews (Tier 1), Sonnet for routine reviews (Tier 2-4).
 
-### Reviewer (Read-Only)
+## Agent Files
 
-- **File**: `.github/agents/reviewer.agent.md`
-- **Purpose**: Code review, quality assessment, security audit
-- **Access**: Read-only — cannot edit code files
-- **Outputs**: Review comments, quality reports, approval/rejection
-- **Hands off to**: Builder (if changes needed) or merge approval
+| Agent | Definition |
+|-------|-----------|
+| Architect | `.github/agents/architect.agent.md` |
+| Scaffolder | `.github/agents/scaffolder.agent.md` |
+| Builder | `.github/agents/builder.agent.md` |
+| Reviewer | `.github/agents/reviewer.agent.md` |
 
 ## Handoff Protocol
 
@@ -44,17 +46,31 @@
 3. Builder is the default — if no agent is specified, assume Builder.
 4. Architect and Reviewer are read-only gates — they cannot be bypassed.
 
+Standard flow: **Architect → Scaffolder → Builder → Reviewer → merge**
+
+Not every task needs every agent. A bug fix skips Architect and Scaffolder. A design discussion stays in Architect. Match the flow to the work.
+
 ## Context Loading
 
 All agents automatically load:
 
 1. This file (`AGENTS.md`)
-2. `.agent/context/project.md` — project details
-3. `.agent/context/conventions.md` — coding standards
-4. `.agent/context/stack.md` — technology stack
-5. `.agent/context/infrastructure.md` — IaC conventions
-6. `.agent/context/decisions.md` — architecture decision records
-7. `.agent/tasks/current.md` — active work items
-8. `.agent/memory/gotchas.md` — known pitfalls
+2. `CLAUDE.md` — project context for Claude Code (purpose, architecture, conventions, state)
+3. `.agent/context/project.md` — project details
+4. `.agent/context/conventions.md` — coding standards
+5. `.agent/context/stack.md` — technology stack
+6. `.agent/context/infrastructure.md` — IaC conventions
+7. `.agent/context/decisions.md` — architecture decision records
+8. `.agent/tasks/current.md` — active work items
+9. `.agent/memory/gotchas.md` — known pitfalls
 
-Language-specific instructions load automatically based on the file being edited.
+Language-specific instructions load automatically based on the file being edited (`.github/instructions/`).
+
+## Org Rules
+
+1. **No agent does two jobs.** Architect designs. Builder builds. Reviewer reviews.
+2. **Reviewer never reviews its own work.** Always a different agent from the implementer.
+3. **Architect never writes code.** If it's producing implementation, the role boundary is broken.
+4. **Builder never makes architectural decisions.** Flag to Architect, don't decide.
+5. **Stubs should be minimal.** No speculative exports. Add code when the first consumer needs it.
+6. **Read before you write.** Every agent checks `.agent/context/` and `.agent/memory/gotchas.md` before acting.
