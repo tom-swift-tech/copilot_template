@@ -28,4 +28,4 @@ applyTo: '**/*.tf'
 - Prefer Azure PaaS over IaaS — don't run what Azure can manage
 - **Never inline secrets** — use Key Vault references
 
-Refer to [.agent/context/infrastructure.md](../../.agent/context/infrastructure.md) for full enterprise IaC conventions.
+Refer to [.agent/context/infrastructure/terraform.md](../../.agent/context/infrastructure/terraform.md) for full enterprise Terraform conventions and [.agent/context/infrastructure/azure.md](../../.agent/context/infrastructure/azure.md) for Azure resource naming and tagging.

@@ -14,4 +14,4 @@ applyTo: '**/*.{ps1,psm1,psd1}'
 - Never use `-ErrorAction SilentlyContinue` without justification
 - Use `try/catch` with `-ErrorAction Stop` for error handling
 
-Refer to [.agent/context/infrastructure.md](../../.agent/context/infrastructure.md) for enterprise conventions.
+Refer to [.agent/context/infrastructure/powershell.md](../../.agent/context/infrastructure/powershell.md) for full enterprise PowerShell conventions.

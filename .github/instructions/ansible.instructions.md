@@ -16,4 +16,4 @@ applyTo: '**/*.{yml,yaml}'
 - Use proper modules — avoid `command`/`shell` where a module exists
 - `#Requires` header for any PowerShell scripts called from Ansible
 
-Refer to [.agent/context/infrastructure.md](../../.agent/context/infrastructure.md) for full enterprise IaC conventions.
+Refer to [.agent/context/infrastructure/ansible.md](../../.agent/context/infrastructure/ansible.md) for full enterprise Ansible conventions.
