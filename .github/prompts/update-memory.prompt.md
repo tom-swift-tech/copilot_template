@@ -27,6 +27,16 @@ Review the current conversation and extract any reusable knowledge into the appr
 - **Gotchas**: One-liner problem → fix format, bracketed category, dated.
 - **Patterns**: Named pattern with when/how/example/date.
 
+## Test and Validate (mandatory — even memory updates must be validated)
+
+> Memory rot is silent. An update that wrote to the wrong file or duplicated an existing entry corrupts every future read. Validate before claiming done.
+
+1. **Re-read each touched memory file** and confirm the new entries are present, dated, and in the right section.
+2. **Duplicate check**: grep the file for the new entry's distinguishing phrase. If you see it twice, you appended to a file that already had it — remove the duplicate.
+3. **Classification check**: a "lesson" in `gotchas.md` is a category error. Re-read the entry and confirm it's in the right file (lesson vs gotcha vs pattern).
+4. **Format check**: each entry has a date and follows the format documented in the file's header. No malformed entries.
+5. **If a task was moved to `done/`**: confirm the file is gone from `current.md` and present in `done/` with the date prefix.
+
 ## Output
 
-Summarize what was added to memory after making the changes.
+Summarize what was added to memory after making the changes, and confirm the Test and Validate checks above passed.

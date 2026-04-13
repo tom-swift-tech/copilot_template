@@ -7,10 +7,11 @@ A two-layer template for enterprise IaC projects that works natively with GitHub
 ## Quick Start
 
 1. Copy this template into your project root.
-2. Fill in `.agent/context/project.md` and `.agent/context/stack.md` with your project details.
-3. Open in VS Code with GitHub Copilot enabled.
-4. Select an agent from the Copilot agent dropdown (**Builder** is the default).
-5. Use slash commands: `/debug`, `/feature`, `/review`, `/deploy`, etc.
+2. Read [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) — the Day 1 runbook.
+3. Fill in `.agent/context/project.md` and `.agent/context/stack.md` with your project details.
+4. Open in VS Code with GitHub Copilot enabled.
+5. Select an agent from the Copilot agent dropdown (**Builder** is the default).
+6. Use slash commands: `/debug`, `/feature`, `/review`, `/deploy`, etc.
 
 For Claude Code: `CLAUDE.md` and `AGENTS.md` are auto-loaded. All `.agent/` context is available.
 
@@ -24,10 +25,10 @@ For Claude Code: `CLAUDE.md` and `AGENTS.md` are auto-loaded. All `.agent/` cont
 │                      │                              │
 │  agents/             │  context/                    │
 │    architect.agent   │    project.md                │
-│    scaffolder.agent  │    conventions.md            │
-│    builder.agent     │    infrastructure.md         │
-│    reviewer.agent    │    stack.md                  │
-│                      │    decisions.md              │
+│    analyst.agent     │    conventions.md            │
+│    scaffolder.agent  │    infrastructure.md         │
+│    builder.agent     │    stack.md                  │
+│    reviewer.agent    │    decisions.md              │
 │  instructions/       │                              │
 │    rust, ts, python  │  tasks/                      │
 │    terraform, ansible│    current.md                │
@@ -42,23 +43,32 @@ For Claude Code: `CLAUDE.md` and `AGENTS.md` are auto-loaded. All `.agent/` cont
 │                      │                              │
 │  skills/             │                              │
 │    update-readme/    │                              │
+│    sync-agents/      │                              │
 ├──────────────────────┴──────────────────────────────┤
 │  CLAUDE.md          — Claude Code entry point        │
 │  AGENTS.md          — Agent definitions (both tools) │
+│  docs/              — ADRs, design docs, GETTING-STARTED │
+│  standards/         — Extended standards (API, DB,    │
+│                       observability, deploy, security)│
 │  .vscode/tasks.json — VS Code build/lint tasks       │
 └─────────────────────────────────────────────────────┘
 ```
+
+> **Mandatory rule baked into every workflow:** every prompt and every agent handoff ends with **Test and Validate**. Engineers don't need to remember it — the prompts won't let them skip it.
 
 ## Agent Personas
 
 | Agent        | Mode        | Access          | Purpose                                  |
 |-------------|-------------|-----------------|------------------------------------------|
 | **Architect** | Read-only   | No code edits   | Design docs, ADRs, architecture diagrams |
+| **Analyst**   | Read-only   | No code edits   | Pressure-test designs and ADRs (freeform critique, never proposals) |
 | **Scaffolder**| Structure   | Config & boilerplate | Directory setup, CI/CD, dependency config|
 | **Builder**   | Full (default)| Read/write all | Features, bug fixes, refactoring, tests  |
 | **Reviewer**  | Read-only   | No code edits   | Code review, quality gates, security audit|
 
-**Handoff flow**: Architect → Scaffolder → Builder → Reviewer → (merge or back to Builder)
+**Handoff flow**: Architect → Analyst → Scaffolder → Builder → Reviewer → (merge or back to Builder)
+
+Analyst is a *gate*, not a step — findings always return to Architect, who decides whether to revise. Skip Analyst for bug fixes, refactors, and trivial features. See [AGENTS.md](AGENTS.md) for the full handoff protocol.
 
 ## Slash Commands
 
@@ -68,6 +78,7 @@ For Claude Code: `CLAUDE.md` and `AGENTS.md` are auto-loaded. All `.agent/` cont
 | `/feature`         | End-to-end feature implementation workflow        |
 | `/refactor`        | Refactoring with safety checks and tests         |
 | `/review`          | Code review against conventions and anti-patterns|
+| `/pressure-test`   | Adversarial critique of a design doc or ADR (Analyst) |
 | `/test`            | Test generation for specified code                |
 | `/deploy`          | Deployment checklist and execution                |
 | `/status`          | Project status from tasks and recent changes      |
@@ -112,12 +123,27 @@ Pre-configured tasks in `.vscode/tasks.json`:
 - **Terraform Validate** — `terraform fmt -check && terraform validate`
 - **Ansible Lint** — `ansible-lint` on playbooks
 
+## Standards
+
+Extended standards live in [standards/](standards/). Each is a starter you replace or expand:
+
+| Standard | Topic |
+|----------|-------|
+| [API-DESIGN.md](standards/API-DESIGN.md) | HTTP API conventions |
+| [DATABASE-DESIGN.md](standards/DATABASE-DESIGN.md) | Schema, migrations, query safety |
+| [OBSERVABILITY.md](standards/OBSERVABILITY.md) | Logs, metrics, traces, alerting |
+| [DEPLOYMENT.md](standards/DEPLOYMENT.md) | Release strategies and rollback |
+| [SECURITY.md](standards/SECURITY.md) | Auth, secrets, input validation |
+
+Every standard ends with a mandatory **Test and Validate** section.
+
 ## Customizing This Template
 
 1. **Add a language**: Create `.github/instructions/<lang>.instructions.md` with an `applyTo` front matter pattern.
-2. **Add a slash command**: Create `.github/prompts/<name>.prompt.md` with front matter.
-3. **Add an agent**: Create `.github/agents/<name>.agent.md` and register it in `AGENTS.md`.
+2. **Add a slash command**: Create `.github/prompts/<name>.prompt.md` with front matter. End it with a `Test and Validate` step.
+3. **Add an agent**: Create `.github/agents/<name>.agent.md`, register it in `AGENTS.md` and `.github/copilot-instructions.md`, then run the `sync-agents` skill to confirm no drift.
 4. **Add context**: Create a new `.md` file in `.agent/context/` and reference it in `CLAUDE.md` and `AGENTS.md`.
+5. **Add a standard**: Drop a `<NAME>.md` in `standards/`, add a row to `standards/README.md`, end with a `Test and Validate` section.
 
 ## Compatibility
 

@@ -24,3 +24,12 @@
 
 1. **{Option A}** — {why rejected}
 2. **{Option B}** — {why rejected}
+
+## Validation
+
+How we will know this decision was right — or that it needs to be revisited:
+
+- **Signal we will measure:** {what observable thing tells us this is working}
+- **Where we will see it:** {dashboard, log, metric, ticket queue, code review pattern}
+- **Threshold for re-evaluation:** {what change in the signal triggers a new ADR}
+- **Test coverage required by this decision:** {what new tests this decision implies}

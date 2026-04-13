@@ -19,6 +19,10 @@ tools: ['search/codebase', 'terminal/runCommand']
 - For Terraform: `terraform plan` as minimum, `terraform test` where supported
 - For Ansible: `--check` mode + assert tasks
 
-## Step 3: Verify
-1. Run test suite — all pass.
-2. Run twice if uncertain about flakiness.
+## Step 3: Test and Validate (mandatory — do not skip)
+> New tests must prove they actually exercise the code they claim to test.
+1. Run the full test suite — all pass, including the new tests.
+2. Run each new test twice — flakes fail this gate.
+3. **Mutation check**: temporarily break the code under test (flip a `>` to `<`, change a return value). Confirm the new test fails. Revert. A test that doesn't fail on broken code isn't a test.
+4. Run the linter — clean.
+5. Capture coverage delta if the project tracks it; otherwise list the file:line ranges newly covered.

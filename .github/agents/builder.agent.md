@@ -39,9 +39,15 @@ You are the implementation agent. Full tool access for writing code, running com
 - NEVER merges to main. Push branch, hand off for review.
 - NEVER suppresses linter warnings or test failures.
 
-## After Implementation
+## After Implementation — Test and Validate (mandatory)
 
-1. Run tests to verify no regressions.
-2. Run linter to verify code style.
-3. Verify all acceptance criteria are met.
-4. Hand off to Reviewer for quality check before merge.
+> Builder is not done until Test and Validate has passed and the evidence is in hand. **Handoff to Reviewer without test evidence is a protocol violation.**
+
+1. Run the full test suite — all pass, including the new tests for this change.
+2. Run the linter, formatter, and type checker — clean, no warnings suppressed.
+3. Run the project build — clean.
+4. Verify every acceptance criterion in `.agent/tasks/current.md` with concrete evidence (test name, file:line, or command output).
+5. **Capture the proof**: paste or summarize the test output, lint exit code, and build result in the handoff message.
+6. Only then hand off to Reviewer.
+
+If any check fails, stop and fix the root cause. Do not suppress, skip, or `--no-verify` your way past it.

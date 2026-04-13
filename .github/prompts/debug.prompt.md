@@ -24,10 +24,13 @@ tools: ['search/codebase', 'terminal/runCommand', 'search/usages']
 1. Implement the minimal fix addressing the root cause.
 2. Follow conventions in [.agent/context/conventions.md](../../.agent/context/conventions.md).
 
-## Step 5: Verify
-1. Write a regression test.
-2. Run the project's test suite — confirm no regressions.
-3. Run the linter.
+## Step 5: Test and Validate (mandatory — do not skip)
+> No bug is fixed until Test and Validate passes. This is the universal final gate.
+1. Write a regression test that **fails on the old code and passes on the fix**. Confirm both.
+2. Run the full test suite — all pass, no flakes.
+3. Run the linter and type checker — clean.
+4. If the bug had a reproduction recipe in the issue, run it again — confirm the symptom is gone.
+5. Capture the proof (failing-then-passing regression test, command output) for the Reviewer.
 
 ## Step 6: Update Memory
 - [.agent/memory/gotchas.md](../../.agent/memory/gotchas.md) — if root cause was non-obvious

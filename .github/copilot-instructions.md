@@ -22,11 +22,12 @@ This repository uses a structured knowledge base in `.agent/`. Always consult it
 
 ## Operating Modes
 
-This project uses four agent roles. Select from the agent dropdown in chat, or use the corresponding slash command. See `AGENTS.md` for the full roster, model routing, and handoff protocol.
+This project uses five agent roles. Select from the agent dropdown in chat, or use the corresponding slash command. See `AGENTS.md` for the full roster, model routing, and handoff protocol.
 
 | Agent | Model | Can edit code? |
 |-------|-------|---------------|
 | **Architect** | Claude Opus 4.6 / GPT-5.2 | No — design docs only |
+| **Analyst** | Claude Opus 4.6 / GPT-5.2 | No — critique only, never proposals |
 | **Scaffolder** | Codex GPT-5.3 / Claude Sonnet 4.6 | Yes — structure only |
 | **Builder** | Codex GPT-5.3 / Claude Sonnet 4.6 | Yes — full access (default) |
 | **Reviewer** | Claude Opus 4.6 / Claude Sonnet 4.6 | No — feedback only |
